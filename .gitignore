@@ -1,4 +1,4 @@
-api/venv
+api/apienv
 simulator/venv
 simulator/.env
 *.pyc
