@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from lib.simulator import simulate_cpu_load, simulate_memory_load
+from lib.simulator import simulateCpuLoad, simulateMemoryLoad
 import multiprocessing
 import time
 import os
@@ -8,8 +8,8 @@ app = Flask(__name__)
 
 @app.route("/message", methods=["POST"])
 def message():
-    simulate_cpu_load(duration=0.5)
-    simulate_memory_load(size_mb=5, duration=0.1)
+    simulateCpuLoad(duration=0.5)
+    simulateMemoryLoad(size_mb=5, duration=0.1)
 
     return jsonify({
         "status": "ok",
@@ -18,7 +18,9 @@ def message():
 
 @app.route("/message/status", methods=["POST"])
 def message_status():
-    simulate_cpu_load(duration=0.2)
+    simulateCpuLoad(duration=0.2)
+    simulateMemoryLoad(size_mb=5, duration=0.1)
+
     return jsonify({
         "status": "ok",
         "message": "Status received."
