@@ -1,0 +1,67 @@
+version: '3.9'
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana 
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /sys:/sys
+      - /:/rootfs:ro,rslave
+    networks:
+      - monitoring
+
+  api:
+    image: marcelo3macedo/tcc_toleranciafalhas_api:v1
+    container_name: api
+    networks:
+      - monitoring
+    expose:
+      - "5000"
+      - "8000"
+    labels:
+      - "prometheus_job=api"
+
+  simulator:
+    image: marcelo3macedo/tcc_toleranciafalhas_simulator:v1
+    container_name: simulator
+    networks:
+      - monitoring
+    environment:
+      - API_ENDPOINT=http://api:5000
+    expose:
+      - "8080"
+    labels:
+      - "prometheus_job=simulator"
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  grafana-data:
