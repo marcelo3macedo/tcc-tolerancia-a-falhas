@@ -27,8 +27,8 @@ def after_request(response):
 
 @app.route("/message", methods=["POST"])
 def message():
-    simulateCpuLoad(duration=0.5)
-    simulateMemoryLoad(size_mb=5, duration=0.1)
+    simulateCpuLoad(duration=1)
+    simulateMemoryLoad(size_mb=10, duration=1)
 
     return jsonify({
         "status": "ok",
@@ -37,8 +37,8 @@ def message():
 
 @app.route("/message/status", methods=["POST"])
 def message_status():
-    simulateCpuLoad(duration=0.2)
-    simulateMemoryLoad(size_mb=5, duration=0.1)
+    simulateCpuLoad(duration=1)
+    simulateMemoryLoad(size_mb=10, duration=1)
 
     return jsonify({
         "status": "ok",
