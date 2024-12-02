@@ -1,12 +1,12 @@
 {
     "0": {"message": 5, "message_status": 2},
-    "1": {"message": 10, "message_status": 3},
-    "2": {"message": 50, "message_status": 20},
-    "3": {"message": 5, "message_status": 1},
-    "4": {"message": 100, "message_status": 50},
-    "5": {"message": 10, "message_status": 5},
-    "6": {"message": 5, "message_status": 2},
-    "7": {"message": 10, "message_status": 3},
-    "8": {"message": 50, "message_status": 20},
-    "9": {"message": 5, "message_status": 1}
+    "1": {"message": 10, "message_status": 60},
+    "2": {"message": 50, "message_status": 35},
+    "3": {"message": 50, "message_status": 40},
+    "4": {"message": 100, "message_status": 80},
+    "5": {"message": 100, "message_status": 70},
+    "6": {"message": 5, "message_status": 3},
+    "7": {"message": 100, "message_status": 90},
+    "8": {"message": 500, "message_status": 400},
+    "9": {"message": 50, "message_status": 40}
 }
