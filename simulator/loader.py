@@ -5,9 +5,9 @@ from lib.requester import sendRequests
 
 def run(scheduleFile):    
     while True:
-        [messageCount, statusCount] = getScheduleInfos(scheduleFile)
+        [messageCount] = getScheduleInfos(scheduleFile)
 
-        print(f"Sending {messageCount} /message requests and {statusCount} /message/status requests")
+        print(f"Sending {messageCount} /message requests")
         
         sendRequests("/message/memory", messageCount)
         

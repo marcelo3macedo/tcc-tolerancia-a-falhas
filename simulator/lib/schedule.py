@@ -12,9 +12,7 @@ def getScheduleInfos(scheduleFile):
         return
 
     messageCount = schedule[lastDigit].get("message", 0)
-    statusCount = schedule[lastDigit].get("message_status", 0)
 
     return {
-        messageCount,
-        statusCount
+        messageCount
     }
