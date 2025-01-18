@@ -16,24 +16,22 @@ def health():
         "message": "Service is running."
     }), 200    
 
-@app.route("/message", methods=["POST"])
+@app.route("/message/cpu", methods=["POST"])
 def message():
-    simulateCpuLoad(duration=1)
-    simulateMemoryLoad(size_mb=10, duration=1)
-
+    simulateCpuLoad(duration=5)
+    
     return jsonify({
         "status": "ok",
-        "message": "Message received.",
+        "message": "Message using CPU received.",
     })
 
-@app.route("/message/status", methods=["POST"])
+@app.route("/message/memory", methods=["POST"])
 def message_status():
-    simulateCpuLoad(duration=1)
-    simulateMemoryLoad(size_mb=10, duration=1)
+    simulateMemoryLoad(size_mb=1, duration=1)
 
     return jsonify({
         "status": "ok",
-        "message": "Status received."
+        "message": "Message using Memory received."
     })
 
 if __name__ == "__main__":
