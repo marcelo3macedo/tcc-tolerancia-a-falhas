@@ -13,10 +13,24 @@ REQUEST_COUNT = Counter(
     ["method", "endpoint", "status"]
 )
 
+def create_session_with_retries():
+    session = requests.Session()
+    retries = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[500, 502, 503, 504],  # Retry for specific HTTP status codes
+        method_whitelist=["POST"],  # Retry only for POST requests
+    )
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session
+
 def sendRequest(endpoint):
     url = f"{API_ENDPOINT}{endpoint}"
+    session = create_session_with_retries()
     try:
-        response = requests.post(url)
+        response = session.post(url)
         
         REQUEST_COUNT.labels(
             method="POST",
