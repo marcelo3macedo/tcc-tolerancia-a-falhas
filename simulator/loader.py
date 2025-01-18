@@ -1,19 +1,20 @@
-import time
+import time, os
 from datetime import datetime
 from lib.schedule import getScheduleInfos
 from lib.requester import sendRequests
 
-def run(scheduleFile):    
+def run(scheduleFile, processType):    
     while True:
-        [messageCount, statusCount] = getScheduleInfos(scheduleFile)
+        [messageCount] = getScheduleInfos(scheduleFile)
 
-        print(f"Sending {messageCount} /message requests and {statusCount} /message/status requests")
+        print(f"Sending {messageCount} /message requests")
         
-        sendRequests("/message", messageCount)
-        sendRequests("/message/status", statusCount)
+        endpoint = '/message/cpu' if processType == 'cpu' else '/message/memory'
+        sendRequests(endpoint, messageCount)
         
         time.sleep(60 - datetime.now().second)
 
 if __name__ == "__main__":
+    process_type = os.getenv("TYPE", "cpu")
     schedule_file = "config/requestSchedule.json"
-    run(schedule_file)
+    run(schedule_file, process_type)

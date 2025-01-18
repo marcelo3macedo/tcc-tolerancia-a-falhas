@@ -37,33 +37,39 @@ services:
       - monitoring
 
   api:
-    image: marcelo3macedo/tcc_toleranciafalhas_api:v1
+    build:
+      context: ./api
+      dockerfile: Dockerfile
     container_name: api
+    restart: always
     networks:
       - monitoring
     expose:
       - "5000"
-      - "8000"
     labels:
       - "prometheus_job=api"
     deploy:
       resources:
         limits:
           cpus: "0.5"
-          memory: "128M"
+          memory: "100M"
         reservations:
-          cpus: "0.2"
-          memory: "64M"
+          cpus: "0.5"
+          memory: "100M"
 
   simulator:
-    image: marcelo3macedo/tcc_toleranciafalhas_simulator:v1
+    build:
+      context: ./simulator
+      dockerfile: Dockerfile
     container_name: simulator
+    restart: always
     networks:
       - monitoring
     environment:
       - API_ENDPOINT=http://api:5000
     expose:
       - "8080"
+      - "8000"
     labels:
       - "prometheus_job=simulator"
 
