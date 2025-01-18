@@ -17,7 +17,7 @@ def create_session_with_retries():
     session = requests.Session()
     retries = Retry(
         total=3,
-        backoff_factor=1,
+        backoff_factor=5,
         status_forcelist=[500, 502, 503, 504],  # Retry for specific HTTP status codes
         method_whitelist=["POST"],  # Retry only for POST requests
     )
