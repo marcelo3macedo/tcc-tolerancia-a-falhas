@@ -9,7 +9,7 @@ def run(scheduleFile):
 
         print(f"Sending {messageCount} /message requests")
         
-        sendRequests("/message/memory", messageCount)
+        sendRequests("/message/cpu", messageCount)
         
         time.sleep(60 - datetime.now().second)
 
