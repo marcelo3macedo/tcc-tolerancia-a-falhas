@@ -11,3 +11,13 @@ def simulateMemoryLoad(size_mb=10, duration=1):
     data = bytearray(size_mb * 1024 * 1024)
     time.sleep(duration)
     del data
+
+def performNetworkRequest():
+    """Performs a network request and waits for completion."""
+    try:
+        response = requests.get("https://httpbin.org/get", timeout=5)
+        print("Network Request Successful:", response.status_code)
+        return response.status_code
+    except requests.RequestException as e:
+        print("Network Request Failed:", e)
+        return None
