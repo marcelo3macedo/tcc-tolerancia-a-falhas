@@ -8,6 +8,11 @@ REQUEST_COUNT = Counter(
     "Total number of requests sent by the caller in network",
     ["method", "endpoint", "status"]
 )
+REQUEST_LATENCY = Histogram(
+    "network_request_latency_seconds",
+    "Latency of HTTP requests",
+    ["method", "endpoint"]
+)
 
 def simulateCpuLoad(duration=0.5):
     """Simulates CPU load for a specified duration."""
@@ -23,8 +28,11 @@ def simulateMemoryLoad(size_mb=10, duration=1):
 
 def performNetworkRequest():
     """Performs a network request and waits for completion."""
+    start_time = time.time()
     try:
         response = requests.get("http://receiver:5001/process", timeout=5)
+        latency = time.time() - start_time
+        REQUEST_LATENCY.labels(method="GET", endpoint="/process").observe(latency)
         REQUEST_COUNT.labels(
             method="GET",
             endpoint="/process",
