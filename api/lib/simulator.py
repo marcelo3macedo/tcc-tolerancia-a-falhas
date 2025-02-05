@@ -1,7 +1,9 @@
 import time, requests, os
 from prometheus_client import Counter, Histogram, start_http_server
+import logging
 
 start_http_server(8001)
+logging.basicConfig(level=logging.INFO)
 
 REQUEST_COUNT = Counter(
     "network_requests_total",
@@ -40,7 +42,7 @@ def performNetworkRequest():
             endpoint="/process",
             status=response.status_code
         ).inc()
-        print("Network Request Successful:", response.status_code)
+        logging.info("Network Request Successful: %s", response.status_code)
         return response.status_code
     except requests.RequestException as e:
         REQUEST_COUNT.labels(
@@ -48,5 +50,5 @@ def performNetworkRequest():
             endpoint="/process",
             status="error"
         ).inc()
-        print("Network Request Failed:", e)
+        logging.info("Network Request error: %s")
         return None
