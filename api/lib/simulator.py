@@ -29,8 +29,10 @@ def simulateMemoryLoad(size_mb=10, duration=1):
 def performNetworkRequest():
     """Performs a network request and waits for completion."""
     start_time = time.time()
+    endpoint = os.getenv("RECEIVER_ENDPOINT", "http://receiver:5001/process")
+
     try:
-        response = requests.get("http://receiver:5001/process", timeout=5)
+        response = requests.get(endpoint, timeout=5)
         latency = time.time() - start_time
         REQUEST_LATENCY.labels(method="GET", endpoint="/process").observe(latency)
         REQUEST_COUNT.labels(
