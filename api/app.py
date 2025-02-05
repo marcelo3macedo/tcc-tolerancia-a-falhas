@@ -9,6 +9,13 @@ app = Flask(__name__)
 def before_request():
     request.start_time = time.time()
 
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({
+        "status": "healthy",
+        "message": "Service is running."
+    }), 200  
+
 @app.route("/message/cpu", methods=["POST"])
 def message():
     simulateCpuLoad(duration=5)
