@@ -1,5 +1,5 @@
-from prometheus_client import Counter, start_http_server
-import requests, os
+from prometheus_client import Counter, Histogram, start_http_server
+import requests, os, time
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor
 
@@ -12,11 +12,20 @@ REQUEST_COUNT = Counter(
     "Total number of requests sent by the caller",
     ["method", "endpoint", "status"]
 )
+REQUEST_LATENCY = Histogram(
+    "response_latency_seconds",
+    "Latency of HTTP requests",
+    ["method", "endpoint"]
+)
 
 def sendRequest(endpoint):
+    start_time = time.time()
     url = f"{API_ENDPOINT}{endpoint}"
     try:
         response = requests.post(url)
+        latency = time.time() - start_time
+        
+        REQUEST_LATENCY.labels(method="GET", endpoint="/sendRequest").observe(latency)
         
         REQUEST_COUNT.labels(
             method="POST",
@@ -25,7 +34,7 @@ def sendRequest(endpoint):
         ).inc()
         
         print(f"Requested {endpoint}, Status Code: {response.status_code}")
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         REQUEST_COUNT.labels(
             method="POST",
             endpoint=endpoint,

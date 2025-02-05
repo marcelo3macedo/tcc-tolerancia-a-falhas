@@ -57,6 +57,12 @@ services:
         reservations:
           cpus: "0.5"
           memory: "100M"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
 
   simulator:
     build:
@@ -73,6 +79,9 @@ services:
       - "8000"
     labels:
       - "prometheus_job=simulator"
+    depends_on:
+      api:
+        condition: service_healthy
 
   receiver:
     build:
