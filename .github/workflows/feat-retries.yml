@@ -27,7 +27,7 @@ jobs:
         with:
           context: ./api
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/tcc_toleranciafalhas_api:cpu
+          tags: ${{ secrets.DOCKER_USERNAME }}/tcc_toleranciafalhas_api:scale
 
       - name: Build and push Docker image simulator
         uses: docker/build-push-action@v4
