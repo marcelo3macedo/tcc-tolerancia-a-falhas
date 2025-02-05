@@ -35,3 +35,10 @@ jobs:
           context: ./simulator
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/tcc_toleranciafalhas_simulator:v1
+
+      - name: Build and push Docker image simulator
+        uses: docker/build-push-action@v4
+        with:
+          context: ./receiver
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/tcc_toleranciafalhas_receiver:v1
