@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from lib.simulator import simulateCpuLoad, simulateMemoryLoad
+from lib.simulator import simulateCpuLoad, simulateMemoryLoad, performNetworkRequest
 import multiprocessing
 import os, time
 
@@ -12,6 +12,7 @@ def before_request():
 @app.route("/message/cpu", methods=["POST"])
 def message():
     simulateCpuLoad(duration=5)
+    performNetworkRequest()
     
     return jsonify({
         "status": "ok",
@@ -21,6 +22,7 @@ def message():
 @app.route("/message/memory", methods=["POST"])
 def message_status():
     simulateMemoryLoad(size_mb=1, duration=1)
+    performNetworkRequest()    
 
     return jsonify({
         "status": "ok",

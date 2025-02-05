@@ -46,6 +46,7 @@ services:
       - monitoring
     expose:
       - "5000"
+      - "8001"
     labels:
       - "prometheus_job=api"
     deploy:
@@ -72,6 +73,17 @@ services:
       - "8000"
     labels:
       - "prometheus_job=simulator"
+
+  receiver:
+    build:
+      context: ./receiver
+      dockerfile: Dockerfile
+    container_name: receiver
+    restart: always
+    expose:
+      - "5001"
+    networks:
+      - monitoring
 
 networks:
   monitoring:
