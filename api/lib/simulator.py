@@ -1,5 +1,5 @@
 import time, requests
-from prometheus_client import Counter, start_http_server
+from prometheus_client import Counter, Histogram, start_http_server
 
 start_http_server(8001)
 
