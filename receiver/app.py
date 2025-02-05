@@ -3,6 +3,14 @@ import time
 
 app = Flask(__name__)
 
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({
+        "status": "healthy",
+        "message": "Service is running."
+    }), 200  
+
 @app.route("/process", methods=["GET"])
 def process_request():
     time.sleep(0.2)
