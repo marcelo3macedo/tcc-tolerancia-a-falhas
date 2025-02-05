@@ -2,6 +2,7 @@ from prometheus_client import Counter, start_http_server
 import requests, os
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type, RetryError
 
 start_http_server(8000)
 load_dotenv()
@@ -13,43 +14,46 @@ REQUEST_COUNT = Counter(
     ["method", "endpoint", "status"]
 )
 
-def create_session_with_retries():
-    session = requests.Session()
-    retries = Retry(
-        total=3,
-        backoff_factor=5,
-        status_forcelist=[500, 502, 503, 504],  # Retry for specific HTTP status codes
-        method_whitelist=["POST"],  # Retry only for POST requests
-    )
-    adapter = HTTPAdapter(max_retries=retries)
-    session.mount("http://", adapter)
-    session.mount("https://", adapter)
-    return session
+def log_retry(retry_state):
+    attempt_number = retry_state.attempt_number
+    total_attempts = retry_state.kwargs.get('retries', 5)
+    print(f"Attempt {attempt_number}/{total_attempts} failed for {retry_state.args[0]}: {retry_state.outcome.exception()}")
 
-def sendRequest(endpoint):
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=1, max=16),
+    retry=retry_if_exception_type(requests.exceptions.RequestException)
+)
+def sendRequest(endpoint, retries=5):
     url = f"{API_ENDPOINT}{endpoint}"
-    session = create_session_with_retries()
+    response = requests.post(url, timeout=10)
+    response.raise_for_status()
+    
+    REQUEST_COUNT.labels(
+        method="POST",
+        endpoint=endpoint,
+        status=response.status_code
+    ).inc()
+    
+    print(f"Requested {endpoint}, Status Code: {response.status_code}")
+    return response
+
+def safeSendRequest(endpoint, retries=5):
     try:
-        response = session.post(url)
-        
-        REQUEST_COUNT.labels(
-            method="POST",
-            endpoint=endpoint,
-            status=response.status_code
-        ).inc()
-        
-        print(f"Requested {endpoint}, Status Code: {response.status_code}")
-    except requests.exceptions.RequestException as e:
+        sendRequest(endpoint, retries=retries)
+    except RetryError as retry_error:
         REQUEST_COUNT.labels(
             method="POST",
             endpoint=endpoint,
             status="error"
         ).inc()
 
-        print(f"Error requesting {endpoint}: {e}")
+        print(f"Error: Max retries reached for {endpoint}. Giving up.")
+        print(f"Final failure: {retry_error.last_attempt.exception()}")
+        raise retry_error.last_attempt.exception()
 
 def sendRequests(endpoint, count):
     with ThreadPoolExecutor(max_workers=count) as executor:
-        futures = [executor.submit(sendRequest, endpoint) for _ in range(count)]
+        futures = [executor.submit(safeSendRequest, endpoint) for _ in range(count)]
         for future in futures:
             future.result()
