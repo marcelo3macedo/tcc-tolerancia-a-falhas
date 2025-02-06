@@ -27,18 +27,18 @@ jobs:
         with:
           context: ./api
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/tcc_toleranciafalhas_api:scale
+          tags: ${{ secrets.DOCKER_USERNAME }}/tcc_toleranciafalhas_api:featRetries
 
       - name: Build and push Docker image simulator
         uses: docker/build-push-action@v4
         with:
           context: ./simulator
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/tcc_toleranciafalhas_simulator:cpu
+          tags: ${{ secrets.DOCKER_USERNAME }}/tcc_toleranciafalhas_simulator:featRetries
 
       - name: Build and push Docker image simulator
         uses: docker/build-push-action@v4
         with:
           context: ./receiver
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/tcc_toleranciafalhas_receiver:cpu
+          tags: ${{ secrets.DOCKER_USERNAME }}/tcc_toleranciafalhas_receiver:featRetries
