@@ -25,38 +25,28 @@ def log_retry(retry_state):
     print(f"Attempt {attempt_number}/{total_attempts} failed for {retry_state.args[0]}: {retry_state.outcome.exception()}")
 
 @retry(
-    stop=stop_after_attempt(5),
-    wait=wait_exponential(multiplier=1, min=1, max=16),
+    stop=stop_after_attempt(10),
+    wait=wait_exponential(multiplier=5, min=1, max=60),
     retry=retry_if_exception_type(requests.exceptions.RequestException)
 )
 def sendRequest(endpoint):
-    start_time = time.time()
     url = f"{API_ENDPOINT}{endpoint}"
-    try:
-        response = requests.post(url)
-        latency = time.time() - start_time
-        
-        REQUEST_LATENCY.labels(method="GET", endpoint="/sendRequest").observe(latency)
-        
-        REQUEST_COUNT.labels(
-            method="POST",
-            endpoint=endpoint,
-            status=response.status_code
-        ).inc()
-        
-        print(f"Requested {endpoint}, Status Code: {response.status_code}")
-    except Exception as e:
-        REQUEST_COUNT.labels(
-            method="POST",
-            endpoint=endpoint,
-            status="error"
-        ).inc()
-
-        print(f"Error requesting {endpoint}: {e}")
+    response = requests.post(url, timeout=20)
+    
+    REQUEST_COUNT.labels(
+        method="POST",
+        endpoint=endpoint,
+        status=response.status_code
+    ).inc()
+    
+    print(f"Requested {endpoint}, Status Code: {response.status_code}")
 
 def safeSendRequest(endpoint, retries=5):
     try:
-        sendRequest(endpoint, retries=retries)
+        start_time = time.time()
+        sendRequest(endpoint)
+        latency = time.time() - start_time
+        REQUEST_LATENCY.labels(method="GET", endpoint="/sendRequest").observe(latency)    
     except RetryError as retry_error:
         REQUEST_COUNT.labels(
             method="POST",
@@ -66,7 +56,6 @@ def safeSendRequest(endpoint, retries=5):
 
         print(f"Error: Max retries reached for {endpoint}. Giving up.")
         print(f"Final failure: {retry_error.last_attempt.exception()}")
-        raise retry_error.last_attempt.exception()
 
 def sendRequests(endpoint, count):
     with ThreadPoolExecutor(max_workers=count) as executor:
